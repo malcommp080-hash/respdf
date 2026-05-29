@@ -1,68 +1,226 @@
--- ============================================================
---  BASE DE DATOS: dav
---  Sistema de Gestión - Clientes, Ventas y Prendas
---  Creado automáticamente - Importar en phpMyAdmin o MySQL CLI
--- ============================================================
+-- Respaldo de base de datos: dav
+-- Fecha: 2026-05-28 20:40:53
 
-CREATE DATABASE IF NOT EXISTS `dav`
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
+SET FOREIGN_KEY_CHECKS=0;
 
-USE `dav`;
+DROP TABLE IF EXISTS `cliente`;
+CREATE TABLE `cliente` (
+  `Id_cliente` int NOT NULL AUTO_INCREMENT,
+  `Nombre` varchar(20) NOT NULL,
+  `Ap_paterno` varchar(20) NOT NULL,
+  `Telefono` varchar(10) NOT NULL,
+  `Contrasena` varchar(255) NOT NULL,
+  `Direccion` varchar(100) NOT NULL,
+  `CP` varchar(5) NOT NULL,
+  PRIMARY KEY (`Id_cliente`),
+  KEY `idx_nombre` (`Nombre`),
+  KEY `idx_apellido` (`Ap_paterno`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- -----------------------------------------------------------
---  TABLA: cliente
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `cliente` (
-  `Id_cliente`  INT          NOT NULL AUTO_INCREMENT,
-  `Nombre`      VARCHAR(100) NOT NULL,
-  `Ap_paterno`  VARCHAR(100) NOT NULL,
-  `Telefono`    VARCHAR(20)  NOT NULL,
-  `Contrasena`  VARCHAR(255) NOT NULL,
-  `Direccion`   VARCHAR(255) NOT NULL,
-  `CP`          VARCHAR(10)  NOT NULL,
-  PRIMARY KEY (`Id_cliente`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+INSERT INTO `cliente` VALUES ('3', 'ss', 'dd', '111', '$2y$10$nnPqMX6wAH9d4LX9NMnTsuP7TXWjCdMtPbexbihF8Y9r4m9DADt4.', 'gg', '555');
+INSERT INTO `cliente` VALUES ('4', 'rodolfo', 'aguirre', '222222', '$2y$10$dHajUbTBQk4XNeAU4zDHsOdG.n8romOkW1EFjqGoV5tWjTQjnum9m', '20 Sep #6', '7403');
 
--- -----------------------------------------------------------
---  TABLA: prendas
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `prendas` (
-  `Id_prendas`  INT          NOT NULL AUTO_INCREMENT,
-  `Prendas`     VARCHAR(150) NOT NULL,
-  `Num_piezas`  INT          NOT NULL DEFAULT 0,
+DROP TABLE IF EXISTS `detallepedidos`;
+CREATE TABLE `detallepedidos` (
+  `id_detallep` int NOT NULL AUTO_INCREMENT,
+  `Cantidad` int NOT NULL,
+  `Id_producto` int NOT NULL,
+  `Id_pedido` int NOT NULL,
+  PRIMARY KEY (`id_detallep`),
+  KEY `Registroproductos_detallepedidos_fk` (`Id_producto`),
+  KEY `Pedido_detallepedidos_fk` (`Id_pedido`),
+  CONSTRAINT `fk_pedido_detallep` FOREIGN KEY (`Id_pedido`) REFERENCES `pedido` (`Id_pedido`),
+  CONSTRAINT `fk_producto_detallep` FOREIGN KEY (`Id_producto`) REFERENCES `registroproductos` (`Id_producto`),
+  CONSTRAINT `Pedido_detallepedidos_fk` FOREIGN KEY (`Id_pedido`) REFERENCES `pedido` (`Id_pedido`),
+  CONSTRAINT `Registroproductos_detallepedidos_fk` FOREIGN KEY (`Id_producto`) REFERENCES `registroproductos` (`Id_producto`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP TABLE IF EXISTS `detalleventa`;
+CREATE TABLE `detalleventa` (
+  `Id_detallev` int NOT NULL AUTO_INCREMENT,
+  `Cantidad` int NOT NULL,
+  `Id_producto` int NOT NULL,
+  PRIMARY KEY (`Id_detallev`),
+  KEY `Registroproductos_detalleventa_fk` (`Id_producto`),
+  CONSTRAINT `fk_producto_detalle` FOREIGN KEY (`Id_producto`) REFERENCES `registroproductos` (`Id_producto`),
+  CONSTRAINT `Registroproductos_detalleventa_fk` FOREIGN KEY (`Id_producto`) REFERENCES `registroproductos` (`Id_producto`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP TABLE IF EXISTS `empleado`;
+CREATE TABLE `empleado` (
+  `Id_empleado` int NOT NULL AUTO_INCREMENT,
+  `Nombre` varchar(20) NOT NULL,
+  `Ap_paterno` varchar(20) NOT NULL,
+  `Telefono` varchar(10) NOT NULL,
+  `Direccion` varchar(40) NOT NULL,
+  `Contrasena` varchar(255) NOT NULL,
+  `rol` varchar(20) NOT NULL,
+  PRIMARY KEY (`Id_empleado`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO `empleado` VALUES ('2', 'Eva', 'Munguia', '222222', 'santa justina', '$2y$10$eIQwyobPc/Ivlj8AGUs/KOXAbgN45eNRmROq6EMQLs3qN9HeXphgK', 'vendedor');
+
+DROP TABLE IF EXISTS `inventario`;
+CREATE TABLE `inventario` (
+  `Stock` int NOT NULL,
+  `Foto` blob NOT NULL,
+  `Id_categoria` int NOT NULL,
+  `Id_producto` int NOT NULL,
+  `Precioneto` decimal(10,2) NOT NULL,
+  KEY `Categoria_Inventario_fk` (`Id_categoria`),
+  KEY `Registroproductos_Inventario_fk` (`Id_producto`),
+  CONSTRAINT `Categoria_Inventario_fk` FOREIGN KEY (`Id_categoria`) REFERENCES `categoria` (`Id_categoria`),
+  CONSTRAINT `fk_categoria_inv` FOREIGN KEY (`Id_categoria`) REFERENCES `categoria` (`Id_categoria`),
+  CONSTRAINT `fk_producto_inv` FOREIGN KEY (`Id_producto`) REFERENCES `registroproductos` (`Id_producto`),
+  CONSTRAINT `Registroproductos_Inventario_fk` FOREIGN KEY (`Id_producto`) REFERENCES `registroproductos` (`Id_producto`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP TABLE IF EXISTS `marcas`;
+CREATE TABLE `marcas` (
+  `Id_marca` int NOT NULL AUTO_INCREMENT,
+  `Marca` varchar(100) NOT NULL,
+  PRIMARY KEY (`Id_marca`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO `marcas` VALUES ('1', 'Nike');
+INSERT INTO `marcas` VALUES ('2', 'Adidas');
+INSERT INTO `marcas` VALUES ('3', 'Puma');
+INSERT INTO `marcas` VALUES ('4', 'Reebok');
+INSERT INTO `marcas` VALUES ('5', 'Under Armour');
+
+DROP TABLE IF EXISTS `marcas_modelos`;
+CREATE TABLE `marcas_modelos` (
+  `Id_mm` int NOT NULL AUTO_INCREMENT,
+  `Id_marca` int NOT NULL,
+  `Id_mc` int NOT NULL,
+  PRIMARY KEY (`Id_mm`),
+  KEY `Modelo_cortes_Marcas_modelos_fk` (`Id_mc`),
+  KEY `Marcas_Marcas_modelos_fk` (`Id_marca`),
+  CONSTRAINT `fk_marca` FOREIGN KEY (`Id_marca`) REFERENCES `marcas` (`Id_marca`),
+  CONSTRAINT `fk_mc` FOREIGN KEY (`Id_mc`) REFERENCES `modelo_cortes` (`Id_mc`),
+  CONSTRAINT `Marcas_Marcas_modelos_fk` FOREIGN KEY (`Id_marca`) REFERENCES `marcas` (`Id_marca`),
+  CONSTRAINT `Modelo_cortes_Marcas_modelos_fk` FOREIGN KEY (`Id_mc`) REFERENCES `modelo_cortes` (`Id_mc`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP TABLE IF EXISTS `modelo_cortes`;
+CREATE TABLE `modelo_cortes` (
+  `Id_mc` int NOT NULL AUTO_INCREMENT,
+  `Modelo` varchar(100) NOT NULL,
+  PRIMARY KEY (`Id_mc`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO `modelo_cortes` VALUES ('1', 'Slim Fit');
+INSERT INTO `modelo_cortes` VALUES ('2', 'Regular Fit');
+INSERT INTO `modelo_cortes` VALUES ('3', 'Relaxed Fit');
+INSERT INTO `modelo_cortes` VALUES ('4', 'Skinny Fit');
+INSERT INTO `modelo_cortes` VALUES ('5', 'Oversized');
+
+DROP TABLE IF EXISTS `pedido`;
+CREATE TABLE `pedido` (
+  `Id_pedido` int NOT NULL AUTO_INCREMENT,
+  `Id_cliente` int NOT NULL,
+  `Fecha` date NOT NULL,
+  `Total` decimal(10,2) NOT NULL,
+  `Totalpiezas` int NOT NULL,
+  PRIMARY KEY (`Id_pedido`),
+  KEY `Cliente_Pedido_fk` (`Id_cliente`),
+  KEY `idx_fecha` (`Fecha`),
+  KEY `idx_total` (`Total`),
+  CONSTRAINT `Cliente_Pedido_fk` FOREIGN KEY (`Id_cliente`) REFERENCES `cliente` (`Id_cliente`),
+  CONSTRAINT `fk_cliente_pedido` FOREIGN KEY (`Id_cliente`) REFERENCES `cliente` (`Id_cliente`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP TABLE IF EXISTS `prendas`;
+CREATE TABLE `prendas` (
+  `Id_prendas` int NOT NULL AUTO_INCREMENT,
+  `Prendas` varchar(10) NOT NULL,
+  `Num_piezas` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`Id_prendas`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- -----------------------------------------------------------
---  TABLA: venta
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS `venta` (
-  `Id_venta`     INT           NOT NULL AUTO_INCREMENT,
-  `Fecha`        DATE          NOT NULL,
-  `Realizacion`  VARCHAR(255)  NOT NULL,
-  `Total`        DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-  `Id_cliente`   INT           NOT NULL,
-  `Total_piezas` INT           NOT NULL DEFAULT 0,
+INSERT INTO `prendas` VALUES ('3', 'jeans', '80');
+INSERT INTO `prendas` VALUES ('4', 'camisa', '68');
+INSERT INTO `prendas` VALUES ('5', 'blusas', '78');
+INSERT INTO `prendas` VALUES ('6', 'camisa', '69');
+INSERT INTO `prendas` VALUES ('7', 'pans', '100');
+
+DROP TABLE IF EXISTS `prendas_tallas`;
+CREATE TABLE `prendas_tallas` (
+  `Id_pt` int NOT NULL AUTO_INCREMENT,
+  `id_genero` int NOT NULL,
+  `Id_prendas` int NOT NULL,
+  `Id_talla` int NOT NULL,
+  PRIMARY KEY (`Id_pt`),
+  KEY `Tallas_Prendas_Tallas_fk` (`Id_talla`),
+  KEY `Prendas_Prendas_Tallas_fk` (`Id_prendas`),
+  KEY `Genero_Prendas_Tallas_fk` (`id_genero`),
+  CONSTRAINT `fk_genero` FOREIGN KEY (`id_genero`) REFERENCES `genero` (`id_genero`),
+  CONSTRAINT `fk_prendas` FOREIGN KEY (`Id_prendas`) REFERENCES `prendas` (`Id_prendas`),
+  CONSTRAINT `fk_talla` FOREIGN KEY (`Id_talla`) REFERENCES `tallas` (`Id_talla`),
+  CONSTRAINT `Genero_Prendas_Tallas_fk` FOREIGN KEY (`id_genero`) REFERENCES `genero` (`id_genero`),
+  CONSTRAINT `Prendas_Prendas_Tallas_fk` FOREIGN KEY (`Id_prendas`) REFERENCES `prendas` (`Id_prendas`),
+  CONSTRAINT `Tallas_Prendas_Tallas_fk` FOREIGN KEY (`Id_talla`) REFERENCES `tallas` (`Id_talla`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP TABLE IF EXISTS `proovedor`;
+CREATE TABLE `proovedor` (
+  `Id_proovedor` int NOT NULL AUTO_INCREMENT,
+  `Nombre` varchar(20) NOT NULL,
+  `Ap_paterno` varchar(20) NOT NULL,
+  `Telefono` varchar(10) NOT NULL,
+  `Direccion` varchar(40) NOT NULL,
+  PRIMARY KEY (`Id_proovedor`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO `proovedor` VALUES ('3', 'MALCO', 'MARTINEZ', '3333333', 'Reforma norte 42');
+
+DROP TABLE IF EXISTS `registroproductos`;
+CREATE TABLE `registroproductos` (
+  `Id_producto` int NOT NULL AUTO_INCREMENT,
+  `Nombre` varchar(20) NOT NULL,
+  `Stock` int NOT NULL,
+  `Id_categoria` int NOT NULL,
+  `Preciopro` decimal(10,2) NOT NULL,
+  `Precioneto` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`Id_producto`),
+  KEY `Categoria_Registroproductos_fk` (`Id_categoria`),
+  CONSTRAINT `Categoria_Registroproductos_fk` FOREIGN KEY (`Id_categoria`) REFERENCES `categoria` (`Id_categoria`),
+  CONSTRAINT `fk_categoria` FOREIGN KEY (`Id_categoria`) REFERENCES `categoria` (`Id_categoria`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP TABLE IF EXISTS `tallas`;
+CREATE TABLE `tallas` (
+  `Id_talla` int NOT NULL AUTO_INCREMENT,
+  `Talla` int NOT NULL,
+  PRIMARY KEY (`Id_talla`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+DROP TABLE IF EXISTS `venta`;
+CREATE TABLE `venta` (
+  `Id_venta` int NOT NULL AUTO_INCREMENT,
+  `Fecha` date NOT NULL,
+  `Realizacion` varchar(40) NOT NULL,
+  `Total` decimal(10,2) NOT NULL,
+  `Id_cliente` int NOT NULL,
+  `Total_piezas` int NOT NULL,
+  `Id_detallev` int DEFAULT NULL,
   PRIMARY KEY (`Id_venta`),
-  CONSTRAINT `fk_venta_cliente`
-    FOREIGN KEY (`Id_cliente`) REFERENCES `cliente` (`Id_cliente`)
-    ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `detalleventa_Venta_fk` (`Id_detallev`),
+  KEY `Cliente_Venta_fk` (`Id_cliente`),
+  CONSTRAINT `Cliente_Venta_fk` FOREIGN KEY (`Id_cliente`) REFERENCES `cliente` (`Id_cliente`),
+  CONSTRAINT `detalleventa_Venta_fk` FOREIGN KEY (`Id_detallev`) REFERENCES `detalleventa` (`Id_detallev`),
+  CONSTRAINT `fk_cliente_venta` FOREIGN KEY (`Id_cliente`) REFERENCES `cliente` (`Id_cliente`),
+  CONSTRAINT `fk_detallev_venta` FOREIGN KEY (`Id_detallev`) REFERENCES `detalleventa` (`Id_detallev`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- -----------------------------------------------------------
---  DATOS DE PRUEBA (opcionales — puedes borrar este bloque)
--- -----------------------------------------------------------
-INSERT INTO `cliente` (`Nombre`, `Ap_paterno`, `Telefono`, `Contrasena`, `Direccion`, `CP`) VALUES
-('Juan',   'García',   '2221000001', '$2y$12$examplehashAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'Av. Reforma 100', '72000'),
-('María',  'López',    '2221000002', '$2y$12$examplehashAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'Calle Hidalgo 45', '72010'),
-('Carlos', 'Martínez', '2221000003', '$2y$12$examplehashAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'Blvd. Atlixco 200', '72530');
+INSERT INTO `venta` VALUES ('8', '2026-05-05', 'barbas', '265215.00', '4', '65', NULL);
 
-INSERT INTO `prendas` (`Prendas`, `Num_piezas`) VALUES
-('Camisa', 50),
-('Pantalón', 30),
-('Vestido', 20);
-
-INSERT INTO `venta` (`Fecha`, `Realizacion`, `Total`, `Id_cliente`, `Total_piezas`) VALUES
-(CURDATE(), 'Venta inicial de prueba', 350.00, 1, 5),
-(CURDATE(), 'Segunda venta de prueba', 820.50, 2, 12);
+SET FOREIGN_KEY_CHECKS=1;
